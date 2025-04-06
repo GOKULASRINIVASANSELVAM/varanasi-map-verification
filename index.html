@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Map Verification | Varanasi Smart Tourist Map</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #f8f8f8;
+    }
+    .verified {
+      color: green;
+      font-size: 24px;
+      margin-top: 30px;
+    }
+    .invalid {
+      color: red;
+      font-size: 24px;
+      margin-top: 30px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>✅ Varanasi Map Verification</h1>
+  <p>Enter your map code (e.g., VS-2025-001) to check authenticity.</p>
+  
+  <input type="text" id="codeInput" placeholder="Enter your map code">
+  <button onclick="verifyCode()">Verify</button>
+
+  <div id="result"></div>
+
+  <script>
+    // List of valid codes
+    const validCodes = ["VS-2025-001", "VS-2025-002", "VS-2025-003"];
+
+    function verifyCode() {
+      const input = document.getElementById('codeInput').value.trim().toUpperCase();
+      const resultDiv = document.getElementById('result');
+
+      if (validCodes.includes(input)) {
+        resultDiv.innerHTML = `<div class="verified">✅ Verified Map Code: ${input}</div>`;
+      } else {
+        resultDiv.innerHTML = `<div class="invalid">❌ Invalid or Unrecognized Code.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
