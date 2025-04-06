@@ -1,38 +1,65 @@
-<script>
-  let validCodes = [];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Varanasi Map Verification</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { padding: 10px; width: 300px; }
+    button { padding: 10px; margin-left: 10px; }
+    .verified { color: green; font-weight: bold; margin-top: 10px; }
+    .invalid { color: red; font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Varanasi Map Code Verification</h1>
+  <input id="codeInput" type="text" placeholder="Enter map code" />
+  <button onclick="checkCode()">Verify</button>
+  <div id="result"></div>
 
-  async function loadJSON() {
-    const response = await fetch("map_codes.json");
-    const data = await response.json();
-    validCodes = data.codes.map(code => code.toUpperCase());
-  }
+  <script>
+    let validCodes = [];
 
-  function getCodeFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('code')?.toUpperCase();
-  }
-
-  function checkCode(code = null) {
-    const inputCode = code || document.getElementById('codeInput').value.toUpperCase();
-    const resultDiv = document.getElementById('result');
-    if (!inputCode) {
-      resultDiv.innerHTML = "<div class='invalid'>❗ No code entered.</div>";
-      return;
+    async function loadJSON() {
+      try {
+        const response = await fetch("map_codes.json");
+        if (!response.ok) throw new Error("Cannot load JSON");
+        const data = await response.json();
+        validCodes = data.codes.map(code => code.toUpperCase());
+      } catch (error) {
+        document.getElementById("result").innerHTML = "<div class='invalid'>⚠️ Failed to load code list.</div>";
+      }
     }
 
-    if (validCodes.includes(inputCode)) {
-      resultDiv.innerHTML = `<div class='verified'>✅ Verified Map Code: ${inputCode}</div>`;
-    } else {
-      resultDiv.innerHTML = `<div class='invalid'>❌ Invalid or Unrecognized Code.</div>`;
+    function getCodeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('code')?.toUpperCase();
     }
-  }
 
-  window.onload = async () => {
-    await loadJSON();
-    const code = getCodeFromURL();
-    if (code) {
-      document.getElementById('codeInput').value = code;
-      checkCode(code);
+    function checkCode(code = null) {
+      const inputCode = code || document.getElementById('codeInput').value.toUpperCase();
+      const resultDiv = document.getElementById('result');
+      if (!inputCode) {
+        resultDiv.innerHTML = "<div class='invalid'>❗ No code entered.</div>";
+        return;
+      }
+
+      if (validCodes.includes(inputCode)) {
+        resultDiv.innerHTML = `<div class='verified'>✅ Verified Map Code: ${inputCode}</div>`;
+      } else {
+        resultDiv.innerHTML = `<div class='invalid'>❌ Invalid or Unrecognized Code.</div>`;
+      }
     }
-  };
-</script>
+
+    window.onload = async () => {
+      await loadJSON();
+      const code = getCodeFromURL();
+      if (code) {
+        document.getElementById('codeInput').value = code;
+        checkCode(code);
+      }
+    };
+  </script>
+</body>
+</html>
