@@ -1,72 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Varanasi Map Code Verification</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, button { padding: 10px; font-size: 16px; margin-top: 10px; }
-    .verified { color: green; margin-top: 20px; font-weight: bold; }
-    .invalid { color: red; margin-top: 20px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h1>✅ Verify Your Map Code</h1>
-  <input type="text" id="codeInput" placeholder="Enter your code" />
-  <button onclick="checkCode()">Verify</button>
-  <div id="result"></div>
+<script>
+  const validCodes = ["VS-2025-001", "VS-2025-002", "VS-2025-003"]; // Add your real codes here
 
-  <script>
-    let validCodes = [];
+  function getCodeFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code')?.toUpperCase();
+  }
 
-    async function loadCSV() {
-      try {
-        const response = await fetch("map_codes.csv");
-        const csvText = await response.text();
-        const lines = csvText.trim().split("\n");
-        const header = lines[0].toLowerCase();
-        const codeIndex = header.includes("code") ? 0 : null;
-
-        if (codeIndex === null) {
-          document.getElementById('result').innerHTML = "<div class='invalid'>⚠️ CSV header must be 'code'.</div>";
-          return;
-        }
-
-        validCodes = lines.slice(1).map(line => line.trim().toUpperCase());
-      } catch (err) {
-        document.getElementById('result').innerHTML = "<div class='invalid'>⚠️ Failed to load CSV.</div>";
-      }
+  function verifyCode(code) {
+    const resultDiv = document.getElementById('result');
+    if (!code) {
+      resultDiv.innerHTML = "<div class='invalid'>❗ No code entered. Please enter your map code.</div>";
+      return;
     }
-
-    function getCodeFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("code")?.toUpperCase();
+    if (validCodes.includes(code)) {
+      resultDiv.innerHTML = `<div class="verified">✅ Verified Map Code: ${code}</div>`;
+    } else {
+      resultDiv.innerHTML = `<div class="invalid">❌ Invalid or Unrecognized Code.</div>`;
     }
+  }
 
-    function checkCode(code = null) {
-      const inputCode = code || document.getElementById("codeInput").value.toUpperCase();
-      const resultDiv = document.getElementById("result");
-      if (!inputCode) {
-        resultDiv.innerHTML = "<div class='invalid'>❗ Please enter a code.</div>";
-        return;
-      }
-
-      if (validCodes.includes(inputCode)) {
-        resultDiv.innerHTML = `<div class='verified'>✅ Verified Map Code: ${inputCode}</div>`;
-      } else {
-        resultDiv.innerHTML = `<div class='invalid'>❌ Invalid or Unrecognized Code.</div>`;
-      }
+  // Auto verify when page loads
+  window.onload = () => {
+    const code = getCodeFromURL();
+    if (code) {
+      document.getElementById('codeInput').value = code;
     }
-
-    window.onload = async () => {
-      await loadCSV();
-      const code = getCodeFromURL();
-      if (code) {
-        document.getElementById("codeInput").value = code;
-        checkCode(code);
-      }
-    };
-  </script>
-</body>
-</html>
+    verifyCode(code);
+  };
+</script>
