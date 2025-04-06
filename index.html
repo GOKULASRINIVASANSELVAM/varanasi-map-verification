@@ -1,70 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Map Code Verification</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background: #f9f9f9;
-    }
-    h1 {
-      color: #333;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .verified {
-      color: green;
-    }
-    .invalid {
-      color: red;
-    }
-  </style>
-</head>
-<body>
-  <h1>Varanasi Map Verification</h1>
-  <p>Scan the map QR or enter your code below:</p>
-  <input type="text" id="codeInput" placeholder="Enter your map code" />
-  <button onclick="checkCode()">Verify</button>
+<script>
+  let validCodes = [];
 
-  <div id="result"></div>
+  // Load CSV and store codes
+  async function loadCSV() {
+    const response = await fetch("map_codes.csv");
+    const text = await response.text();
+    const lines = text.trim().split("\n").slice(1); // skip header
+    validCodes = lines.map(line => line.trim().toUpperCase());
+  }
 
-  <script>
-    const validCodes = ["VS-2025-001", "VS-2025-002", "VS-2025-003"]; // Add your real codes
+  function getCodeFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code')?.toUpperCase();
+  }
 
-    function getCodeFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('code')?.toUpperCase();
+  function checkCode(code = null) {
+    const inputCode = code || document.getElementById('codeInput').value.toUpperCase();
+    const resultDiv = document.getElementById('result');
+    if (!inputCode) {
+      resultDiv.innerHTML = "<div class='invalid'>❗ No code entered.</div>";
+      return;
     }
 
-    function checkCode(code = null) {
-      const inputCode = code || document.getElementById('codeInput').value.toUpperCase();
-      const resultDiv = document.getElementById('result');
-      if (!inputCode) {
-        resultDiv.innerHTML = "<div class='invalid'>❗ No code entered.</div>";
-        return;
-      }
-
-      if (validCodes.includes(inputCode)) {
-        resultDiv.innerHTML = `<div class='verified'>✅ Verified Map Code: ${inputCode}</div>`;
-      } else {
-        resultDiv.innerHTML = `<div class='invalid'>❌ Invalid or Unrecognized Code.</div>`;
-      }
+    if (validCodes.includes(inputCode)) {
+      resultDiv.innerHTML = `<div class='verified'>✅ Verified Map Code: ${inputCode}</div>`;
+    } else {
+      resultDiv.innerHTML = `<div class='invalid'>❌ Invalid or Unrecognized Code.</div>`;
     }
+  }
 
-    // Auto verify if code is in URL
-    window.onload = () => {
-      const code = getCodeFromURL();
-      if (code) {
-        document.getElementById('codeInput').value = code;
-        checkCode(code);
-      }
-    };
-  </script>
-</body>
-</html>
+  // Load CSV and auto-verify
+  window.onload = async () => {
+    await loadCSV();
+    const code = getCodeFromURL();
+    if (code) {
+      document.getElementById('codeInput').value = code;
+      checkCode(code);
+    }
+  };
+</script>
