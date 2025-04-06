@@ -1,12 +1,10 @@
 <script>
   let validCodes = [];
 
-  // Load CSV and store codes
-  async function loadCSV() {
+  async function loadJSON() {
     const response = await fetch("map_codes.csv");
-    const text = await response.text();
-    const lines = text.trim().split("\n").slice(1); // skip header
-    validCodes = lines.map(line => line.trim().toUpperCase());
+    const data = await response.json();
+    validCodes = data.codes.map(code => code.toUpperCase());
   }
 
   function getCodeFromURL() {
@@ -29,9 +27,8 @@
     }
   }
 
-  // Load CSV and auto-verify
   window.onload = async () => {
-    await loadCSV();
+    await loadJSON();
     const code = getCodeFromURL();
     if (code) {
       document.getElementById('codeInput').value = code;
